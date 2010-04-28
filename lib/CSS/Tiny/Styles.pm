@@ -44,7 +44,7 @@ sub AUTOLOAD {
     my $attr = $AUTOLOAD;
     $attr =~ s/.*:://;
 
-    no strict 'refs';
+    no strict 'refs'; ## no critic
 
     return unless exists $self->{$attr};
     return CSS::Tiny::Style->new($attr, $self->{$attr});
