@@ -1,67 +1,10 @@
 package CSS::Tiny::Style;
 
-use version; $VERSION = qv('0.0.3');
-
-use warnings;
-use strict;
-use Carp;
-
-use CSS::Tiny;
-use HTML::Element;
-
-package CSS::Tiny;
-
-sub selectors {
-    my $self = shift;
-    return keys %{ $self };
-}
-
-sub styles {
-    my $self = shift;
-    my @styles = $self->_sorted_styles;
-
-    return @styles;
-}
-
-sub _sorted_styles {
-    return sort { $a->specificity <=> $b->specificity } shift->_all_styles
-}
-
-sub _all_styles {
-    my $self = shift;
-    my @res;
-    while (my ($selector, $properties) = each %{ $self }) {
-	push @res, CSS::Tiny::Style->new($selector, $properties);
-    }
-    return @res;
-}
-
-our $AUTOLOAD;
-
-sub AUTOLOAD {
-    my $self = shift;
-
-    my $attr = $AUTOLOAD;
-    $attr =~ s/.*:://;
-
-    return unless exists $self->{$attr};
-    return CSS::Tiny::Style->new($attr, $self->{$attr});
-}
-
-
-sub style {
-    my $self = shift;
-    my $style = shift;
-
-    return unless exists $self->{$style};
-    return CSS::Tiny::Style->new($style, $self->{$style});
-}
-
-package CSS::Tiny::Style;
-
 use warnings;
 use strict;
 no warnings qw/uninitialized/;
+
+use version; our $VERSION = qv('0.0.3');
 
 use Carp;
 use overload
@@ -133,19 +76,19 @@ sub element_match {
     @sel = $self->selector_array unless @sel;
 
 
-    no strict 'refs';
+    #no strict 'refs';
 
     my $sel = shift @sel;
     for (qw/tag id class/) {
-	my $sub = "_$_";
+        my $sub = "_$_";
 
-	next unless (my $val = &$sub($sel));  # skip test if no value in selector
+        next unless (my $val = $sub->($sel));  # skip test if no value in selector
 
-	my $att = /tag/ ? '_tag' : $_;        # HTML::Element behaviour
-	$val = $val eq '*' ? $el->tag : $val; # always matches
+        my $att = /tag/ ? '_tag' : $_;        # HTML::Element behaviour
+        $val = $val eq '*' ? $el->tag : $val; # always matches
 
 
-	return unless ($val && ((lc $val) eq (lc $el->attr($att))));
+        return unless ($val && ((lc $val) eq (lc $el->attr($att))));
     }
     use strict 'refs';
     return 1;
@@ -159,13 +102,13 @@ sub match {
 
     my ($sel, $rel, @sel);
     if (@_) {
-	(
-	 $sel,	# the first selector
-	 $rel, 	# the relationship, i.e.: '>' or '+' or ' '
-	 @sel	# the remaining selector
-	) = @_;
+        (
+            $sel,	# the first selector
+            $rel, 	# the relationship, i.e.: '>' or '+' or ' '
+            @sel	# the remaining selector
+        ) = @_;
     } else {
-	($sel, $rel, @sel) = $self->selector_array;
+        ($sel, $rel, @sel) = $self->selector_array;
     }
 
 
@@ -178,16 +121,16 @@ sub match {
 
     my $match = 0;
     for (@el) {
-	if ($self->element_match($_, $sel)) {
-	    # if element matches, check his relatives
-	    if ($rel) {
-		my $rellist = $_->$rel;
-		$match = $self->match($rellist, @sel)
-	    } else {
-		$match = 1;
-	    }
-	}
-	last if $match;
+        if ($self->element_match($_, $sel)) {
+            # if element matches, check his relatives
+            if ($rel) {
+		        my $rellist = $rel eq 'lineage' ? [$_->$rel] : $->$rel;
+                $match = $self->match($rellist, @sel)
+            } else {
+                $match = 1;
+            }
+        }
+        last if $match;
     };
     return $match;
 }
@@ -202,9 +145,9 @@ sub selector {
 sub selector_array {
     my $self = shift;
     unless (defined $self->{_selarr}) {
-	my $selector = $self->selector;
-	my @sel = _sel_arr($selector);
-	$self->{_selarr} = [@sel];
+        my $selector = $self->selector;
+        my @sel = _sel_arr($selector);
+        $self->{_selarr} = [@sel];
     }
     return @{ $self->{_selarr} };
 }
@@ -252,7 +195,7 @@ sub specificity {
 	    $self->count_ids * 100 +
 	    $self->count_attributes * 10 +
 	    $self->count_tags
-	    );
+	);
 }
 
 sub tag { _tag(shift->selector) }
@@ -281,20 +224,22 @@ sub _sel_arr {
     my @d;
 
     while ($_) {
-	my ($tag, $op);
+        my ($tag, $op);
 
+    	s/(\@page|[a-zA-Z0-9.\#\*\:_-]+)\s*$//; $tag = $1;
+        $op  = $1 if (s/(\s*[+>]*\s*)$//);
 
-	s/([a-zA-Z0-9.\#\*]+)\s*$//; $tag = $1;
-	$op  = $1 if (s/(\s*[+>]*\s*)$//);
+        push @d, $tag if $tag;
 
-
-	push @d, $tag if $tag;
-
-	for ($op) {
-	    /\+/    && do { push @d, 'left';    last; };
-	    /\>/    && do { push @d, 'parent';  last; };
-	    /^\s+$/ && do { push @d, 'lineage';	last; };
-	}
+        for ($op) {
+            /\+/    && do { push @d, 'left';    last; };
+            /\>/    && do { push @d, 'parent';  last; };
+            /^\s+$/ && do { push @d, 'lineage';	last; };
+        }
+        unless ( $tag or $op ) {
+            carp "Unable to parse selector: '$_'";
+            last;
+        }
     }
     return @d;
 }
@@ -319,8 +264,8 @@ sub _class {
     return $1;
 }
 
-
 1;
+
 __END__
 
 =head1 NAME
@@ -364,11 +309,11 @@ This document describes CSS::Tiny::Style version 0.0.3
     $css = CSS::Tiny->read( 'stylesheet.css' );
 
     for my $el ($tree->descendants) {
-	for my $st ($css->styles) {
-	    if ($st->match($el)) {
-		$st->add_style($el);
-	    }
-	}
+        for my $st ($css->styles) {
+            if ($st->match($el)) {
+                $st->add_style($el);
+            }
+        }
     }
     print $tree->as_HTML;
   
@@ -536,6 +481,11 @@ without taking into account the ancestors.
 Inlines the style definition into the element.
 
 
+=head3 stringify
+
+Returns style in string form.
+
+
 =for author to fill in:
     Write a separate section listing the public components of the modules
     interface. These normally consist of either subroutines that may be
@@ -548,7 +498,6 @@ Inlines the style definition into the element.
 =head1 DEPENDENCIES
 
   CSS::Tiny
-  HTML::Element
 
 =head1 INCOMPATIBILITIES
 

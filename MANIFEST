@@ -5,7 +5,10 @@ META.yml # Will be created by "make dist"
 Makefile.PL
 README
 lib/CSS/Tiny/Style.pm
+lib/CSS/Tiny/Styles.pm
 t/00.load.t
+t/10styles.t
+t/10styles.css
 t/perlcritic.t
 t/pod-coverage.t
 t/pod.t

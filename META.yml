@@ -1,22 +1,27 @@
 ---
-name: CSS-Tiny-Style
-version: v0.0.3
+abstract: 'Object oriented interface to CSS stylesheets'
 author:
   - 'Simone Cesano <scesano@cpan.org>'
-abstract: Object oriented interface to CSS stylesheets
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3603'
 license: perl
-resources:
-  license: http://dev.perl.org/licenses/
-requires:
-  Test::More: 0
-  version: 0
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: CSS-Tiny-Style
 provides:
-  CSS::Tiny:
-    file: lib/CSS/Tiny/Style.pm
   CSS::Tiny::Style:
     file: lib/CSS/Tiny/Style.pm
     version: v0.0.3
-generated_by: Module::Build version 0.2806
-meta-spec:
-  url: http://module-build.sourceforge.net/META-spec-v1.2.html
-  version: 1.2
+  CSS::Tiny::Styles:
+    file: lib/CSS/Tiny/Styles.pm
+    version: v0.0.3
+requires:
+  CSS::Tiny: 0
+  Carp: 0
+  Test::More: 0
+  version: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: v0.0.3

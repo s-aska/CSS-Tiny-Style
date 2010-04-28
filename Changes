@@ -1,5 +1,17 @@
 Revision history for CSS-Tiny-Style
 
+0.0.3_01
+        - changes by Barbie
+        - added AUTOMATED_TESTING check to tests not requuired for user install
+        - split CSS::Tiny out from CSS::Tiny::Style as duplicate package 
+          declarations were causing prerequisites errors. now called 
+          CSS::Tiny::Styles and uses CSS::Tiny as a base.
+        - added missing dependencies.
+        - fixed errors/warnings as suggested by Perl::critic tests.
+        - incorporated patch RT#28718 from Tokuhiro Matsuno 
+        - added extra test file, providing basic tests of the modules
+        - fixed selector match for "a:hover".
+
 0.0.1  Wed Jan 24 20:09:53 2007
        Initial release.
 

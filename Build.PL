@@ -8,8 +8,10 @@ my $builder = Module::Build->new(
     dist_author         => 'Simone Cesano <scesano@cpan.org>',
     dist_version_from   => 'lib/CSS/Tiny/Style.pm',
     requires => {
-        'Test::More' => 0,
-        'version'    => 0,
+        'Carp'          => 0,
+        'CSS::Tiny'     => 0,
+        'Test::More'    => 0,
+        'version'       => 0,
     },
     add_to_cleanup      => [ 'CSS-Tiny-Style-*' ],
 );
